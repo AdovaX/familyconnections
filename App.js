@@ -1,48 +1,87 @@
-import React from 'react';
-import { StyleSheet, Text, View,Button,TouchableOpacity } from 'react-native';
- 
-export default function App() {
+import * as React from 'react';
+import { Button, View, Text, Image , StyleSheet} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Onboarding from 'react-native-onboarding-swiper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+  
+
+function HomeScreen({ navigation }) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Hello ,{"\n"} 
-      Welcome to Family Contacts</Text>
-      <TouchableOpacity style={styles.loginBtn} >
-        <Text style={styles.btnText}>Continue
-         </Text>
+    <Onboarding
+   //onDone = {()=> navigation.replace("LoginScreen")}
+   // onSkip = {(navigation.replace("Details"))} 
+    containerStyles={{position:'relative', top:-60, }}
+    pages={[
+      {
+        backgroundColor: '#fff',
+        image: <Image source={require('./assets/images/pic1.jpg')} resizeMode="contain" style={{ width: 300, height: 300 }}/>,
+        title: 'Family Bond',
+        subtitle: 'Never miss anyone from your family...',
         
-      </TouchableOpacity>
-     </View>
+      },{
+        backgroundColor: '#fff',
+        image: <Image source={require('./assets/images/pic2.jpg')} resizeMode="contain" style={{ width: 300, height: 300 }}/>,
+        title: 'Family Love',
+        subtitle: 'Remind the wonderfull memories...',
+        
+      },{
+        backgroundColor: '#fff',
+        image: <Image source={require('./assets/images/pic0.jpg')} resizeMode="contain" style={{ width: 300, height: 300 }}/>,
+        title: 'Family Connection',
+        subtitle: 'Always connect with them...',
+        
+      },
+     ]}
+  />
+  );
+}
+ 
+function LoginScreen({ navigation }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center',  }}>
+      <Text>[ Login ]</Text>
+      
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-  flex: 1,
-  backgroundColor: '#fff',
-  alignItems: 'center',
-  justifyContent: 'center',
-  },
-  heading:{
-  color:'black',
-  fontSize:24,
-  fontWeight:'bold',
-  },
-  loginBtn:{
-  width: 190,
-  marginTop: 20,
-  backgroundColor: "blue",
-  padding: 14,
-  borderRadius: 50,
-  textAlign:'center'
-  },
-  btnText: {
-  color: "white",
-  fontSize: 20,
-  justifyContent: "center",
-  textAlign: "center",
-  },
-  loginBtnIcon:{
-    color:'white', 
-    top:20
+const Stack = createStackNavigator();
+ 
+  const App =() => {
+    const [isFirstLaunch , setFirstLaunch] = React.useState(null);
+    React.useEffect(() =>{
+      AsyncStorage.getItem('alreadyLaunched').then(Value =>{
+        if(Value == null){
+          AsyncStorage.setItem('alreadyLaunched' , 'true');
+          setFirstLaunch(true);
+
+        }else{
+          setFirstLaunch(false);
+
+        }
+      });
+    });
+    if(isFirstLaunch == null){
+      return null;
+    }else if (isFirstLaunch == true){
+      return ( 
+        <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{headerTitleAlign: 'center'}}>
+          <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Family Connections' }}/>
+          <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ title: 'Login' }} />
+         </Stack.Navigator>
+        </NavigationContainer>
+      );
+
+    }
+    else{
+      return(
+        <LoginScreen />
+      );
+    }
   }
-});
+ 
+ 
+
+export default App;
